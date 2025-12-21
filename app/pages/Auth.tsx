@@ -149,7 +149,7 @@ export default function Auth() {
             </button>
           ) : (
             <button
-              disabled={oneTimeCode.length !== 8}
+              disabled={oneTimeCode.length !== 6}
               className="
                 rounded-[15px] px-[25px] py-[11px]
                 w-full max-w-[300px]
