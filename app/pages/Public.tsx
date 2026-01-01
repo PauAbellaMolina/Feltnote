@@ -1,15 +1,9 @@
 "use client";
-import { EditorContent, useEditor } from "@tiptap/react";
-
-import Document from "@tiptap/extension-document";
-import Paragraph from "@tiptap/extension-paragraph";
-import Text from "@tiptap/extension-text";
-import Heading from "@tiptap/extension-heading";
-import ListItem from "@tiptap/extension-list-item";
+import { useEditor } from "@tiptap/react";
 
 // --- Tiptap Core Extensions ---
 import { Image } from "@tiptap/extension-image";
-import { BulletList, TaskItem, TaskList } from "@tiptap/extension-list";
+import { TaskItem, TaskList } from "@tiptap/extension-list";
 import { TextAlign } from "@tiptap/extension-text-align";
 import { Typography } from "@tiptap/extension-typography";
 import { Highlight } from "@tiptap/extension-highlight";
@@ -29,18 +23,28 @@ import "@/components/tiptap-templates/simple/simple-editor.scss";
 
 import { useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { BlurLockedExtension } from "@/components/BlurLockedExtension";
+import { StarterKit } from "@tiptap/starter-kit";
+
+import "@/app/public.css";
+import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor";
 
 export default function Public({ noteId }: { noteId: string }) {
   const editor = useEditor({
     immediatelyRender: false,
     editable: false,
     extensions: [
-      Document,
-      Paragraph,
-      Text,
-      Heading,
-      BulletList,
-      ListItem,
+      BlurLockedExtension.configure({
+        blurClassName: "blur",
+        blurMarkers: true, // set false to keep @lock/@unlock visible
+      }),
+      StarterKit.configure({
+        horizontalRule: false,
+        link: {
+          openOnClick: false,
+          enableClickSelection: true,
+        },
+      }),
       HorizontalRule,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       TaskList,
@@ -63,19 +67,17 @@ export default function Public({ noteId }: { noteId: string }) {
 
   useEffect(() => {
     if (!editor) return;
+
     supabase
-      .from("notes")
-      .select("id,content")
-      .eq("id", noteId)
-      .single()
+      .rpc("get_note_content_randomized", { note_id: noteId })
       .then(({ data, error }) => {
         if (error) {
           console.error("Error fetching notes:", error);
         } else {
-          editor?.commands.setContent(data.content.content);
+          editor?.commands.setContent(data);
         }
       });
   }, [editor]);
 
-  return <EditorContent editor={editor} />;
+  return <SimpleEditor editor={editor} />;
 }
