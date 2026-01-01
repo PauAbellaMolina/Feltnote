@@ -1,0 +1,18 @@
+.blur {
+  filter: blur(4px);
+}
+
+/* Optional: prevent text selection/copy on blurred segments */
+.blur {
+  user-select: none;
+  pointer-events: none;
+}
+
+.tiptap-toolbar {
+  display: none !important;
+}
+
+.simple-editor-content {
+  padding-top: 40px !important;
+  padding-bottom: 40px !important;
+}

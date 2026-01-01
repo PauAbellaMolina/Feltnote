@@ -1,5 +1,5 @@
 "use client";
-import { EditorContext, useEditor } from "@tiptap/react";
+import { useEditor } from "@tiptap/react";
 
 // --- Tiptap Core Extensions ---
 import { StarterKit } from "@tiptap/starter-kit";
@@ -135,9 +135,5 @@ export default function Home({ session }: { session: Session }) {
     }, 2000);
   });
 
-  return (
-    <EditorContext.Provider value={{ editor }}>
-      <SimpleEditor editor={editor} />
-    </EditorContext.Provider>
-  );
+  return <SimpleEditor editor={editor} />;
 }

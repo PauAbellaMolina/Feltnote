@@ -40,7 +40,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      _randomize_text_fields: {
+        Args: { charset: string; node: Json }
+        Returns: Json
+      }
+      get_note_content_randomized: { Args: { note_id: number }; Returns: Json }
     }
     Enums: {
       [_ in never]: never
