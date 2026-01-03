@@ -23,11 +23,13 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils";
 import "@/components/tiptap-templates/simple/simple-editor.scss";
 
 import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Session } from "@supabase/supabase-js";
 
 export default function Home({ session }: { session: Session }) {
+  const [noteId, setNoteId] = useState<string | null>(null);
+
   const editor = useEditor({
     immediatelyRender: false,
     editorProps: {
@@ -72,6 +74,7 @@ export default function Home({ session }: { session: Session }) {
     // Load the editor content from LocalStorage
     const note = JSON.parse(localStorage.getItem("note") || "{}");
     if (note.id) {
+      setNoteId(note.id);
       editor?.commands.setContent(note.content);
     } else {
       supabase
@@ -98,6 +101,7 @@ export default function Home({ session }: { session: Session }) {
                       "note",
                       JSON.stringify({ id: data.id, content: {} })
                     );
+                    setNoteId(data.id);
                   }
                 });
             } else {
@@ -105,6 +109,7 @@ export default function Home({ session }: { session: Session }) {
                 "note",
                 JSON.stringify({ id: data[0].id, content: data[0].content })
               );
+              setNoteId(data[0].id);
               editor?.commands.setContent(data[0].content.content);
             }
           }
@@ -137,7 +142,7 @@ export default function Home({ session }: { session: Session }) {
 
   return (
     <EditorContext.Provider value={{ editor }}>
-      <SimpleEditor editor={editor} />
+      <SimpleEditor editor={editor} noteId={noteId} />
     </EditorContext.Provider>
   );
 }

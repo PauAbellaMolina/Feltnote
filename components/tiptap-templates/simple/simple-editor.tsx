@@ -57,18 +57,25 @@ import { ThemeToggle } from "@/components/tiptap-templates/simple/theme-toggle";
 import "@/components/tiptap-templates/simple/simple-editor.scss";
 
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor";
+import { ShareIcon } from "@/components/tiptap-icons/share-icon";
+import { CheckIcon } from "@/components/tiptap-icons/check-icon";
 
 const MainToolbarContent = ({
   onHighlighterClick,
   onLinkClick,
   isMobile,
+  noteId,
 }: {
   onHighlighterClick: () => void;
   onLinkClick: () => void;
   isMobile: boolean;
+  noteId: string | null;
 }) => {
   return (
     <>
+      <ToolbarGroup>
+        <ShareNoteButton noteId={noteId} />
+      </ToolbarGroup>
       <Spacer />
 
       <ToolbarGroup>
@@ -137,6 +144,32 @@ const MainToolbarContent = ({
   );
 };
 
+const ShareNoteButton = ({ noteId }: { noteId: string | null }) => {
+  const copyToClipboard = () => {
+    if (!noteId) return;
+    navigator.clipboard.writeText(`${window.location.origin}/${noteId}`);
+    setIsCopied(true);
+    setTimeout(() => {
+      setIsCopied(false);
+    }, 2000);
+  };
+  const [isCopied, setIsCopied] = useState(false);
+  return (
+    <div className="relative">
+      <Button data-style="ghost" onClick={() => copyToClipboard()}>
+        {isCopied ? (
+          <CheckIcon className="tiptap-button-icon" />
+        ) : (
+          <ShareIcon className="tiptap-button-icon" />
+        )}
+        <span className="ml-1 font-medium">
+          {isCopied ? "Copied to clipboard!" : "Share Note"}
+        </span>
+      </Button>
+    </div>
+  );
+};
+
 const MobileToolbarContent = ({
   type,
   onBack,
@@ -166,7 +199,13 @@ const MobileToolbarContent = ({
   </>
 );
 
-export function SimpleEditor({ editor }: { editor: Editor | null }) {
+export function SimpleEditor({
+  editor,
+  noteId,
+}: {
+  editor: Editor | null;
+  noteId: string | null;
+}) {
   const isMobile = useIsBreakpoint();
   const { height } = useWindowSize();
   const [mobileView, setMobileView] = useState<"main" | "highlighter" | "link">(
@@ -202,6 +241,7 @@ export function SimpleEditor({ editor }: { editor: Editor | null }) {
             onHighlighterClick={() => setMobileView("highlighter")}
             onLinkClick={() => setMobileView("link")}
             isMobile={isMobile}
+            noteId={noteId}
           />
         ) : (
           <MobileToolbarContent
